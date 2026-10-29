@@ -11,4 +11,14 @@ slices; a checkpoint is not marked complete until its focused tests pass.
   publication gate requiring an eligible finding on a changed line.
 - **Tests:** `uv run --extra dev pytest` (14 passed); `uv run --extra dev ruff check .` (passed).
 - **Commit:** `feat: add domain foundation` (created after final verification).
-- **Next:** Implement normalized diff structures and changed-line mapping.
+- **Next:** Milestone 2 (completed).
+
+## Milestone 2: Unified diff mapping
+
+- **Built:** A per-file unified-diff parser with immutable hunk/line records,
+    old/new line mapping, changed-line extraction, and explicit rejection of
+    malformed or overlong hunks. Handles empty patches and no-newline markers.
+- **Tests:** `uv run --locked --extra dev pytest` (22 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: parse review diff line mappings` (created after final verification).
+- **Next:** Add webhook event validation and raw-body signature verification.
