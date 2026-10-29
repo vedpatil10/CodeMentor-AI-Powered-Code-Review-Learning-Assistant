@@ -11,3 +11,5 @@ build/
 *.egg-info/
 *.pem
 *.key
+*.sqlite3
+data/

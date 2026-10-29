@@ -43,5 +43,18 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Tests:** `uv run --locked --extra dev pytest` (47 passed);
     `uv run --locked --extra dev ruff check .` (passed).
 - **Commit:** `feat: add FastAPI health endpoints` (created after final verification).
-- **Next:** Add configuration and durable webhook delivery/idempotency before
-    exposing the webhook endpoint.
+- **Next:** Milestone 5 (completed).
+
+## Milestone 5: Signed webhook intake and local outbox
+
+- **Built:** Environment-backed webhook settings; signed `/webhooks/github`
+    endpoint; SQLite-backed delivery records and durable review-job outbox;
+    duplicate delivery, repeated PR-head, and conflicting delivery-ID handling.
+    Only authenticated, validated pull-request events can create jobs. SQLite is
+    a local adapter; production PostgreSQL/Redis wiring remains future work.
+- **Tests:** `uv run --locked --extra dev pytest` (57 passed);
+    `uv run --locked --extra dev ruff check .` (passed). Includes concurrent
+    multi-connection idempotency coverage.
+- **Commit:** `feat: persist and deduplicate GitHub webhook jobs` (created after final verification).
+- **Next:** Add a worker that claims persisted jobs safely and tracks explicit
+    lifecycle states before any GitHub API calls.
