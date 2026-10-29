@@ -51,3 +51,24 @@ def test_finding_rejects_confidence_outside_unit_interval(confidence: float) -> 
 def test_review_result_rejects_unknown_fields() -> None:
     with pytest.raises(ValidationError):
         ReviewResult.model_validate({"summary": "Done", "findings": [], "extra": True})
+
+
+def test_review_result_schema_requires_all_structured_output_fields() -> None:
+    schema = ReviewResult.model_json_schema()
+
+    assert set(schema["required"]) == {"summary", "findings"}
+    assert set(schema["$defs"]["Finding"]["required"]) == {
+        "file_path",
+        "start_line",
+        "end_line",
+        "category",
+        "severity",
+        "confidence",
+        "title",
+        "problem",
+        "why_it_matters",
+        "trigger_scenario",
+        "suggested_action",
+        "evidence",
+        "evidence_source",
+    }

@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "app/handler.py",
+      "patch": "@@ -1 +1 @@\n-result = None\n+result = records[0]",
+      "source": "result = records[0]\nreturn result"
+    }
+  ],
+  "review": {
+    "summary": "The new indexing operation needs an empty-result guard.",
+    "findings": [
+      {
+        "file_path": "app/handler.py",
+        "start_line": 1,
+        "end_line": 1,
+        "category": "correctness",
+        "severity": "medium",
+        "confidence": 0.96,
+        "title": "Handle an empty record list",
+        "problem": "The code indexes the first item without checking whether the list is empty.",
+        "why_it_matters": "A request with no matching records raises an IndexError.",
+        "trigger_scenario": "The query returns an empty list.",
+        "suggested_action": "Handle the empty result before indexing and add a zero-result test.",
+        "evidence": "result = records[0]",
+        "evidence_source": "diff"
+      }
+    ]
+  }
+}

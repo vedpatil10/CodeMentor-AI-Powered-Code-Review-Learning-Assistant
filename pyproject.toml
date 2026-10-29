@@ -9,12 +9,16 @@ description = "Evidence-driven AI code review and learning assistant"
 requires-python = ">=3.12"
 dependencies = [
 	"fastapi>=0.115,<1",
+	"openai>=2,<3",
 	"pydantic>=2.7,<3",
 	"uvicorn>=0.30,<1",
 ]
 
 [project.optional-dependencies]
 dev = ["httpx>=0.27,<1", "pytest>=8,<9", "ruff>=0.6,<1"]
+
+[project.scripts]
+codementor-review-fixture = "app.cli.review_fixture:main"
 
 [tool.setuptools.packages.find]
 include = ["app*"]

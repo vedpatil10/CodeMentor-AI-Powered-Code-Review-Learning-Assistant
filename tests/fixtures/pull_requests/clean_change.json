@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "path": "app/constants.py",
+      "patch": "@@ -1 +1 @@\n-LIMIT = 10\n+LIMIT = 20",
+      "source": "LIMIT = 20"
+    }
+  ],
+  "review": {
+    "summary": "No actionable issues found.",
+    "findings": []
+  }
+}

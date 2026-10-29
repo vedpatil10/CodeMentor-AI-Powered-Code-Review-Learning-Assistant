@@ -91,5 +91,20 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Tests:** `uv run --locked --extra dev pytest` (79 passed);
     `uv run --locked --extra dev ruff check .` (passed).
 - **Commit:** `feat: validate structured review findings` (created after final verification).
-- **Next:** Add a concrete model adapter and a local fixture-report command,
-    then record no-finding and rejected-finding evaluation cases.
+- **Next:** Milestone 9 (completed).
+
+## Milestone 9: Structured model adapter and offline runner
+
+- **Built:** OpenAI Responses API adapter using strict Pydantic parsing,
+    bounded request time/output tokens, prompt-injection framing, and sanitized
+    handling for refusal, incomplete, missing-output, and provider-error cases.
+    Added `codementor-review-fixture` with one evidence-backed defect fixture,
+    one clean-change abstention fixture, and rejected-finding reporting.
+- **Tests:** `uv run --locked --extra dev pytest` (91 passed);
+    `uv run --locked --extra dev ruff check .` (passed). CLI smoke test accepted
+    one finding and returned zero findings for the clean fixture.
+- **API verification:** Provider behavior tested with mocks; no live model call
+    was made because no API key was configured.
+- **Commit:** `feat: add structured model adapter and fixture runner` (created after final verification).
+- **Next:** Expand the fixed evaluation dataset and add repository context
+    retrieval; keep all results behind the deterministic validator.
