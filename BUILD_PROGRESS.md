@@ -21,4 +21,16 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Tests:** `uv run --locked --extra dev pytest` (22 passed);
     `uv run --locked --extra dev ruff check .` (passed).
 - **Commit:** `feat: parse review diff line mappings` (created after final verification).
-- **Next:** Add webhook event validation and raw-body signature verification.
+- **Next:** Milestone 3 (completed).
+
+## Milestone 3: Webhook security primitives
+
+- **Built:** Constant-time HMAC-SHA256 verification over raw request bytes;
+    strict supported pull-request event parsing; validation of delivery IDs,
+    repository/installation/PR identifiers, repository names, and immutable SHAs;
+    safe ignore decisions for unrelated event types and actions.
+- **Tests:** `uv run --locked --extra dev pytest` (44 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: validate signed GitHub webhook events` (created after final verification).
+- **Next:** Build FastAPI health routes and an authenticated webhook endpoint,
+    then connect it to durable delivery deduplication and queueing.
