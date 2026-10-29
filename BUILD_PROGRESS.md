@@ -79,5 +79,17 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Tests:** `uv run --locked --extra dev pytest` (68 passed);
     `uv run --locked --extra dev ruff check .` (passed).
 - **Commit:** `feat: build bounded review packets` (created after final verification).
-- **Next:** Add a structured model-provider interface and local fixture review
-    path, with no GitHub publication until findings pass validation.
+- **Next:** Milestone 8 (completed).
+
+## Milestone 8: Structured candidate validation
+
+- **Built:** A provider protocol and review runner that always applies a
+    deterministic gate. Findings must cite a reviewed file, an added line, and
+    evidence present in the packet; severity/confidence thresholds, duplicates,
+    and inline comment limits are enforced before returning accepted candidates.
+    Rejections retain machine-readable reason codes for evaluation.
+- **Tests:** `uv run --locked --extra dev pytest` (79 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: validate structured review findings` (created after final verification).
+- **Next:** Add a concrete model adapter and a local fixture-report command,
+    then record no-finding and rejected-finding evaluation cases.
