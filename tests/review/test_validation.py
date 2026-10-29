@@ -27,16 +27,22 @@ def make_finding(**overrides: object) -> Finding:
     return Finding.model_validate(data)
 
 
-def make_packet() -> ReviewPacket:
+def make_packet(repository_files: dict[str, str] | None = None) -> ReviewPacket:
+    patch = "@@ -1 +1 @@\n-old_value = 1\n+new_value = 1"
+    source = "new_value = 1\nreturn new_value"
+    if repository_files is not None:
+        patch = "@@ -1 +1 @@\n-old_value = 1\n+new_value = fetch_records()"
+        source = "new_value = fetch_records()\nreturn new_value"
     return build_review_packet(
         [
             FilePatchInput(
                 path="src/handler.py",
-                patch="@@ -1 +1 @@\n-old_value = 1\n+new_value = 1",
-                source="new_value = 1\nreturn new_value",
+                patch=patch,
+                source=source,
             )
         ],
         PacketPolicy(context_radius=1),
+        repository_files=repository_files,
     )
 
 
@@ -112,6 +118,24 @@ def test_validator_checks_retrieved_code_evidence_against_context() -> None:
     result = validate_review_result(
         ReviewResult(summary="One candidate.", findings=[finding]),
         make_packet(),
+        ReviewPolicy(),
+    )
+
+    assert result.findings == (finding,)
+
+
+def test_validator_accepts_evidence_from_retrieved_symbol() -> None:
+    packet = make_packet(
+        {"app/store.py": "def fetch_records():\n    return repository.query()"}
+    )
+    finding = make_finding(
+        evidence="return repository.query()",
+        evidence_source="retrieved_code",
+    )
+
+    result = validate_review_result(
+        ReviewResult(summary="One candidate.", findings=[finding]),
+        packet,
         ReviewPolicy(),
     )
 

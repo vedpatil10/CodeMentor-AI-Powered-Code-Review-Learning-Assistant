@@ -24,15 +24,21 @@ class FakeResponses:
         return self.response
 
 
-def make_packet() -> ReviewPacket:
+def make_packet(repository_files: dict[str, str] | None = None) -> ReviewPacket:
+    patch = "@@ -1 +1 @@\n-old_value = 1\n+new_value = 1"
+    source = "new_value = 1"
+    if repository_files is not None:
+        patch = "@@ -1 +1 @@\n-old_value = 1\n+new_value = fetch_records()"
+        source = "new_value = fetch_records()"
     return build_review_packet(
         [
             FilePatchInput(
                 path="src/handler.py",
-                patch="@@ -1 +1 @@\n-old_value = 1\n+new_value = 1",
-                source="new_value = 1",
+                patch=patch,
+                source=source,
             )
-        ]
+        ],
+        repository_files=repository_files,
     )
 
 
@@ -51,6 +57,26 @@ def test_model_uses_structured_schema_and_serializes_packet_as_data() -> None:
     assert isinstance(input_messages, list)
     assert "untrusted data" in input_messages[0]["content"]
     assert '"path":"src/handler.py"' in input_messages[1]["content"]
+    assert '"retrieved_symbols":[]' in input_messages[1]["content"]
+
+
+def test_model_serializes_retrieved_symbols_with_provenance() -> None:
+    responses = FakeResponses(
+        SimpleNamespace(
+            status="completed",
+            output_parsed=ReviewResult(summary="No findings.", findings=[]),
+        )
+    )
+    model = OpenAIReviewModel("test-key", "test-model", client=SimpleNamespace(responses=responses))
+
+    model.generate_findings(
+        make_packet({"app/store.py": "def fetch_records():\n    return []"})
+    )
+
+    assert responses.request is not None
+    input_messages = responses.request["input"]
+    assert isinstance(input_messages, list)
+    assert '"provenance":"app/store.py:1-2"' in input_messages[1]["content"]
 
 
 def test_model_rejects_missing_api_key_without_injected_client() -> None:

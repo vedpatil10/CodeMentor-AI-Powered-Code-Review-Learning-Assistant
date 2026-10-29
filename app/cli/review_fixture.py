@@ -34,6 +34,7 @@ class ReviewFixture(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     files: list[FilePatchFixture] = Field(max_length=500)
+    context_files: dict[str, str] = Field(default_factory=dict, max_length=500)
     review: ReviewResult | None = None
     packet_policy: PacketPolicy = Field(default_factory=PacketPolicy)
     review_policy: ReviewPolicy = Field(default_factory=ReviewPolicy)
@@ -82,6 +83,7 @@ def build_packet(fixture: ReviewFixture) -> ReviewPacket:
             for file_patch in fixture.files
         ),
         fixture.packet_policy,
+        repository_files=fixture.context_files,
     )
 
 

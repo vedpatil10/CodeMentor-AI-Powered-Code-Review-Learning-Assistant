@@ -87,7 +87,7 @@ def _rejection_reason(
         return RejectionReason.FILE_NOT_REVIEWED
     if (finding.file_path, finding.start_line) not in packet.changed_lines:
         return RejectionReason.LOCATION_NOT_CHANGED
-    if not _has_evidence(finding, file_packet):
+    if not _has_evidence(finding, file_packet, packet):
         return RejectionReason.EVIDENCE_NOT_FOUND
     if finding.confidence < policy.min_confidence:
         return RejectionReason.BELOW_CONFIDENCE
@@ -96,7 +96,11 @@ def _rejection_reason(
     return None
 
 
-def _has_evidence(finding: Finding, file_packet: ReviewFilePacket) -> bool:
+def _has_evidence(
+    finding: Finding,
+    file_packet: ReviewFilePacket,
+    packet: ReviewPacket,
+) -> bool:
     evidence = finding.evidence.strip()
     if not evidence:
         return False
@@ -110,7 +114,13 @@ def _has_evidence(finding: Finding, file_packet: ReviewFilePacket) -> bool:
             if line.new_line is not None
         )
     elif finding.evidence_source is EvidenceSource.RETRIEVED_CODE:
-        supplied_lines = (line.content for line in file_packet.source_context)
+        supplied_lines = (
+            line.content for line in file_packet.source_context
+        )
+        supplied_content = "\n".join(supplied_lines) + "\n" + "\n".join(
+            symbol.content for symbol in packet.retrieved_symbols
+        )
+        return evidence in supplied_content
     else:
         return False
     return evidence in "\n".join(supplied_lines)

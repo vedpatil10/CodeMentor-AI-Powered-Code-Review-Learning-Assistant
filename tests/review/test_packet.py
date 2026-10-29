@@ -88,6 +88,22 @@ def test_packet_enforces_file_and_total_byte_budgets() -> None:
     ]
 
 
+def test_packet_includes_retrieved_symbols_only_when_repository_context_is_supplied() -> None:
+    changed_file = FilePatchInput(
+        path="app/handler.py",
+        patch="@@ -1 +1 @@\n-old = None\n+result = fetch_records()",
+    )
+    context_files = {"app/store.py": "def fetch_records():\n    return []"}
+
+    with_context = build_review_packet([changed_file], repository_files=context_files)
+    without_context = build_review_packet([changed_file])
+
+    assert len(with_context.retrieved_symbols) == 1
+    assert with_context.retrieved_symbols[0].qualified_name == "fetch_records"
+    assert with_context.retrieved_symbols[0].provenance == "app/store.py:1-2"
+    assert without_context.retrieved_symbols == ()
+
+
 @pytest.mark.parametrize("max_files", [0, 501])
 def test_packet_policy_rejects_unbounded_file_limits(max_files: int) -> None:
     with pytest.raises(ValidationError):

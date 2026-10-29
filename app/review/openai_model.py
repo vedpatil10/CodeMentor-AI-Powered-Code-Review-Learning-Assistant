@@ -82,6 +82,9 @@ class OpenAIReviewModel:
                 for file_packet in packet.files
             ],
             "changed_lines": sorted(packet.changed_lines),
+            "retrieved_symbols": [
+                symbol.model_dump(mode="json") for symbol in packet.retrieved_symbols
+            ],
         }
         user_content = json.dumps(payload, ensure_ascii=True, separators=(",", ":"))
 

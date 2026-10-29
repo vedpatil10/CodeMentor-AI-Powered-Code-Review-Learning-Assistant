@@ -1,6 +1,6 @@
 """Build bounded review packets from local or GitHub-provided file patches."""
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import PurePosixPath
@@ -8,6 +8,7 @@ from pathlib import PurePosixPath
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.github.diff import DiffParseError, FileDiff, parse_unified_diff
+from app.retrieval.lexical import RetrievalPolicy, RetrievedSymbol, retrieve_python_symbols
 
 
 class FileSkipReason(StrEnum):
@@ -56,6 +57,8 @@ class SkippedFile:
 @dataclass(frozen=True, slots=True)
 class ReviewPacket:
     files: tuple[ReviewFilePacket, ...]
+    retrieved_symbols: tuple[RetrievedSymbol, ...]
+    retrieval_skipped_paths: tuple[str, ...]
     skipped_files: tuple[SkippedFile, ...]
     changed_lines: frozenset[tuple[str, int]]
     input_bytes: int
@@ -75,12 +78,17 @@ class PacketPolicy(BaseModel):
 def build_review_packet(
     files: Iterable[FilePatchInput],
     policy: PacketPolicy | None = None,
+    repository_files: Mapping[str, str] | None = None,
+    retrieval_policy: RetrievalPolicy | None = None,
 ) -> ReviewPacket:
     """Filter files and collect bounded diff/context with explicit provenance."""
     selected_policy = policy or PacketPolicy()
     included: list[ReviewFilePacket] = []
     skipped: list[SkippedFile] = []
     total_bytes = 0
+    retrieved_symbols: list[RetrievedSymbol] = []
+    retrieval_skipped_paths: set[str] = set()
+    selected_retrieval_policy = retrieval_policy or RetrievalPolicy()
 
     for file_input in files:
         skip_reason = _skip_reason(file_input)
@@ -109,6 +117,29 @@ def build_review_packet(
             skipped.append(SkippedFile(file_input.path, FileSkipReason.INVALID_PATCH))
             continue
 
+        if repository_files is not None and file_input.path.lower().endswith(".py"):
+            remaining_results = selected_retrieval_policy.max_results - len(retrieved_symbols)
+            remaining_bytes = selected_retrieval_policy.max_total_bytes - sum(
+                len(symbol.content.encode("utf-8")) for symbol in retrieved_symbols
+            )
+            if remaining_results > 0 and remaining_bytes > 0:
+                current_retrieval_policy = selected_retrieval_policy.model_copy(
+                    update={"max_results": remaining_results, "max_total_bytes": remaining_bytes}
+                )
+                retrieved = retrieve_python_symbols(
+                    diff, repository_files, current_retrieval_policy
+                )
+                known_symbols = {
+                    (symbol.path, symbol.qualified_name, symbol.start_line)
+                    for symbol in retrieved_symbols
+                }
+                retrieved_symbols.extend(
+                    symbol
+                    for symbol in retrieved.symbols
+                    if (symbol.path, symbol.qualified_name, symbol.start_line) not in known_symbols
+                )
+                retrieval_skipped_paths.update(retrieved.skipped_paths)
+
         included.append(
             ReviewFilePacket(
                 path=file_input.path,
@@ -133,6 +164,8 @@ def build_review_packet(
     )
     return ReviewPacket(
         files=tuple(included),
+        retrieved_symbols=tuple(retrieved_symbols),
+        retrieval_skipped_paths=tuple(sorted(retrieval_skipped_paths)),
         skipped_files=tuple(skipped),
         changed_lines=changed_lines,
         input_bytes=total_bytes,

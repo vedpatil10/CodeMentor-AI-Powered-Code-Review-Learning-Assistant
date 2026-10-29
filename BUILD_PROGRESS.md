@@ -133,5 +133,16 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Tests:** `uv run --locked --extra dev pytest -q` (101 passed);
     `uv run --locked --extra dev ruff check .` (passed).
 - **Commit:** `feat: add Python symbol retrieval` (created after final verification).
-- **Next:** Attach retrieved symbols to review packets and provider input, then
-    build a fixed evaluation runner that compares retrieval with diff-only input.
+- **Next:** Milestone 12 (completed).
+
+## Milestone 12: Retrieval wired into review packets
+
+- **Built:** Optional repository files now flow through packet construction;
+    referenced symbols and line provenance are included in the OpenAI request.
+    The deterministic validator checks `retrieved_code` evidence against those
+    exact snippets. Without repository context, packets remain diff-only.
+- **Tests:** `uv run --locked --extra dev pytest -q` (104 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: include retrieved symbols in review packets` (created after final verification).
+- **Next:** Build a labeled evaluation harness for accepted/rejected findings,
+    then add read-only GitHub PR fetching against immutable head SHAs.
