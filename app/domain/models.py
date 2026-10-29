@@ -75,4 +75,4 @@ class ReviewResult(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     summary: str = Field(min_length=1, max_length=2000)
-    findings: list[Finding] = Field(default_factory=list, max_length=100)
+    findings: list[Finding] = Field(max_length=100)

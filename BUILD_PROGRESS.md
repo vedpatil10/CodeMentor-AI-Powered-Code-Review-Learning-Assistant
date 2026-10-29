@@ -98,6 +98,7 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Built:** OpenAI Responses API adapter using strict Pydantic parsing,
     bounded request time/output tokens, prompt-injection framing, and sanitized
     handling for refusal, incomplete, missing-output, and provider-error cases.
+    Made all review-result fields required for strict schema compatibility.
     Added `codementor-review-fixture` with one evidence-backed defect fixture,
     one clean-change abstention fixture, and rejected-finding reporting.
 - **Tests:** `uv run --locked --extra dev pytest` (91 passed);
@@ -105,6 +106,7 @@ slices; a checkpoint is not marked complete until its focused tests pass.
     one finding and returned zero findings for the clean fixture.
 - **API verification:** Provider behavior tested with mocks; no live model call
     was made because no API key was configured.
-- **Commit:** `feat: add structured model adapter and fixture runner` (created after final verification).
+- **Commit:** `feat: add structured model adapter and fixture runner`, followed
+    by `fix: require findings in review schema` (both verified and pushed).
 - **Next:** Expand the fixed evaluation dataset and add repository context
     retrieval; keep all results behind the deterministic validator.
