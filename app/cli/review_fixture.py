@@ -13,10 +13,11 @@ from app.review.engine import run_review
 from app.review.packet import (
     FilePatchInput,
     PacketPolicy,
+    ReviewPacket,
     SkippedFile,
     build_review_packet,
 )
-from app.review.validation import RejectedFinding
+from app.review.validation import RejectedFinding, ValidatedReview
 
 
 class FilePatchFixture(BaseModel):
@@ -33,7 +34,7 @@ class ReviewFixture(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     files: list[FilePatchFixture] = Field(max_length=500)
-    review: ReviewResult
+    review: ReviewResult | None = None
     packet_policy: PacketPolicy = Field(default_factory=PacketPolicy)
     review_policy: ReviewPolicy = Field(default_factory=ReviewPolicy)
 
@@ -56,8 +57,20 @@ class _FixtureModel:
 
 
 def review_fixture_file(input_path: Path) -> FixtureReport:
-    fixture = ReviewFixture.model_validate_json(input_path.read_text(encoding="utf-8"))
-    packet = build_review_packet(
+    fixture = load_review_fixture(input_path)
+    if fixture.review is None:
+        raise ValueError("offline fixture is missing its expected review")
+    packet = build_packet(fixture)
+    review = run_review(packet, _FixtureModel(fixture.review), fixture.review_policy)
+    return make_report(review, packet)
+
+
+def load_review_fixture(input_path: Path) -> ReviewFixture:
+    return ReviewFixture.model_validate_json(input_path.read_text(encoding="utf-8"))
+
+
+def build_packet(fixture: ReviewFixture) -> ReviewPacket:
+    return build_review_packet(
         (
             FilePatchInput(
                 path=file_patch.path,
@@ -70,7 +83,9 @@ def review_fixture_file(input_path: Path) -> FixtureReport:
         ),
         fixture.packet_policy,
     )
-    review = run_review(packet, _FixtureModel(fixture.review), fixture.review_policy)
+
+
+def make_report(review: ValidatedReview, packet: ReviewPacket) -> FixtureReport:
     return FixtureReport(
         summary=review.summary,
         findings=list(review.findings),

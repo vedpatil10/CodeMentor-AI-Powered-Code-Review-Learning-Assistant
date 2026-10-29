@@ -108,5 +108,18 @@ slices; a checkpoint is not marked complete until its focused tests pass.
     was made because no API key was configured.
 - **Commit:** `feat: add structured model adapter and fixture runner`, followed
     by `fix: require findings in review schema` (both verified and pushed).
-- **Next:** Expand the fixed evaluation dataset and add repository context
-    retrieval; keep all results behind the deterministic validator.
+- **Next:** Milestone 10 (completed).
+
+## Milestone 10: Local live-review command
+
+- **Built:** `codementor-review-local` loads saved diff inputs, invokes the
+    configured provider, runs the same deterministic validation gate, and emits
+    a JSON report. Reused the shared fixture packet builder; missing credentials
+    fail with a sanitized error before any model request. The offline fixture
+    command remains independent of provider credentials.
+- **Tests:** `uv run --locked --extra dev pytest -q` (95 passed);
+    `uv run --locked --extra dev ruff check .` (passed). CLI missing-key smoke
+    test returned `missing_api_key` without making a network request.
+- **Commit:** `feat: add local live review command` (created after final verification).
+- **Next:** Add repository-context retrieval and a labeled evaluation report;
+    then begin GitHub PR fetching and real worker execution.
