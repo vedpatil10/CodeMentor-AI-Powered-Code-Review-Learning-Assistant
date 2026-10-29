@@ -68,5 +68,16 @@ slices; a checkpoint is not marked complete until its focused tests pass.
     `uv run --locked --extra dev ruff check .` (passed). Includes concurrent
     worker-claim and legacy-schema regression tests.
 - **Commit:** `feat: add atomic review job state machine` (created after final verification).
-- **Next:** Implement a worker runner that claims a job and builds a bounded
-    local review packet; then test it with fixtures and mocked providers.
+- **Next:** Milestone 7 (completed).
+
+## Milestone 7: Bounded local review packets
+
+- **Built:** A deterministic packet builder for Python patches with path and
+    file filtering, parsed changed-line references, source-context provenance,
+    per-file/total byte limits, context-line caps, and skipped-file reason codes.
+    The token count is an estimate based on input bytes, not provider usage.
+- **Tests:** `uv run --locked --extra dev pytest` (68 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: build bounded review packets` (created after final verification).
+- **Next:** Add a structured model-provider interface and local fixture review
+    path, with no GitHub publication until findings pass validation.
