@@ -32,5 +32,16 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Tests:** `uv run --locked --extra dev pytest` (44 passed);
     `uv run --locked --extra dev ruff check .` (passed).
 - **Commit:** `feat: validate signed GitHub webhook events` (created after final verification).
-- **Next:** Build FastAPI health routes and an authenticated webhook endpoint,
-    then connect it to durable delivery deduplication and queueing.
+- **Next:** Milestone 4 (completed).
+
+## Milestone 4: FastAPI health shell
+
+- **Built:** Runnable FastAPI app factory, `/health/live` and `/health/ready`
+    routes, explicit response contracts, and ASGI-level endpoint tests.
+    Webhook acceptance is intentionally not exposed until delivery persistence
+    and queueing are implemented.
+- **Tests:** `uv run --locked --extra dev pytest` (47 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: add FastAPI health endpoints` (created after final verification).
+- **Next:** Add configuration and durable webhook delivery/idempotency before
+    exposing the webhook endpoint.
