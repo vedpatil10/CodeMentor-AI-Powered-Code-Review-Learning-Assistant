@@ -56,5 +56,17 @@ slices; a checkpoint is not marked complete until its focused tests pass.
     `uv run --locked --extra dev ruff check .` (passed). Includes concurrent
     multi-connection idempotency coverage.
 - **Commit:** `feat: persist and deduplicate GitHub webhook jobs` (created after final verification).
-- **Next:** Add a worker that claims persisted jobs safely and tracks explicit
-    lifecycle states before any GitHub API calls.
+- **Next:** Milestone 6 (completed).
+
+## Milestone 6: Atomic worker claims and job lifecycle
+
+- **Built:** Atomic queued-job claims, attempt counting, explicit review states,
+    validated transitions, sanitized failure codes, and a durable transition
+    audit trail. Added a compatibility migration that preserves queued records
+    from the earlier SQLite schema.
+- **Tests:** `uv run --locked --extra dev pytest` (62 passed);
+    `uv run --locked --extra dev ruff check .` (passed). Includes concurrent
+    worker-claim and legacy-schema regression tests.
+- **Commit:** `feat: add atomic review job state machine` (created after final verification).
+- **Next:** Implement a worker runner that claims a job and builds a bounded
+    local review packet; then test it with fixtures and mocked providers.
