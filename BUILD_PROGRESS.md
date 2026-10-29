@@ -121,5 +121,17 @@ slices; a checkpoint is not marked complete until its focused tests pass.
     `uv run --locked --extra dev ruff check .` (passed). CLI missing-key smoke
     test returned `missing_api_key` without making a network request.
 - **Commit:** `feat: add local live review command` (created after final verification).
-- **Next:** Add repository-context retrieval and a labeled evaluation report;
-    then begin GitHub PR fetching and real worker execution.
+- **Next:** Milestone 11 (completed).
+
+## Milestone 11: Python AST and lexical retrieval
+
+- **Built:** Non-executing AST extraction for nested classes/functions and
+    lexical lookup of definitions referenced by identifiers on added diff lines.
+    Retrieved snippets carry path/line provenance; unsafe paths, syntax errors,
+    oversized files, excessive result counts, and context byte limits are
+    handled explicitly.
+- **Tests:** `uv run --locked --extra dev pytest -q` (101 passed);
+    `uv run --locked --extra dev ruff check .` (passed).
+- **Commit:** `feat: add Python symbol retrieval` (created after final verification).
+- **Next:** Attach retrieved symbols to review packets and provider input, then
+    build a fixed evaluation runner that compares retrieval with diff-only input.
