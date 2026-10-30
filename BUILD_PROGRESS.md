@@ -146,3 +146,21 @@ slices; a checkpoint is not marked complete until its focused tests pass.
 - **Commit:** `feat: include retrieved symbols in review packets` (created after final verification).
 - **Next:** Build a labeled evaluation harness for accepted/rejected findings,
     then add read-only GitHub PR fetching against immutable head SHAs.
+
+## Milestone 13: Evaluation harness and audit hardening
+
+- **Built:** A labeled offline regression runner for supported, clean, and
+    unsupported-evidence cases. Empty datasets and duplicate case IDs are
+    rejected; fixture paths are confined to the tests tree. Packet byte/token
+    estimates now include retrieved source, and readiness probes SQLite before
+    returning ready.
+- **GitHub visibility:** `.gitignore` and `.env.example` are removed from the
+    current branch tree but retained locally and excluded through `.git/info/exclude`.
+    No actual `.env` is present or tracked. Prior commit history is unchanged;
+    these files contain only ignore patterns and blank placeholders.
+- **Tests:** `uv run --locked --extra dev pytest -q` (111 passed);
+    `uv run --locked --extra dev ruff check .` (passed). Credential-pattern scan
+    found no matches outside ignored dependency/build directories.
+- **Commit:** `fix: harden evaluation and review budgets` (created after final verification).
+- **Next:** Implement read-only GitHub PR fetching, capture immutable base/head
+    SHAs, and normalize changed file patches without publishing comments.

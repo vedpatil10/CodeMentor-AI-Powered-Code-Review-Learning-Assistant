@@ -119,9 +119,16 @@ def build_review_packet(
 
         if repository_files is not None and file_input.path.lower().endswith(".py"):
             remaining_results = selected_retrieval_policy.max_results - len(retrieved_symbols)
-            remaining_bytes = selected_retrieval_policy.max_total_bytes - sum(
+            retrieved_bytes = sum(
                 len(symbol.content.encode("utf-8")) for symbol in retrieved_symbols
             )
+            packet_remaining_bytes = (
+                selected_policy.max_total_bytes - total_bytes - input_bytes
+            )
+            retrieval_remaining_bytes = (
+                selected_retrieval_policy.max_total_bytes - retrieved_bytes
+            )
+            remaining_bytes = min(packet_remaining_bytes, retrieval_remaining_bytes)
             if remaining_results > 0 and remaining_bytes > 0:
                 current_retrieval_policy = selected_retrieval_policy.model_copy(
                     update={"max_results": remaining_results, "max_total_bytes": remaining_bytes}
@@ -133,10 +140,14 @@ def build_review_packet(
                     (symbol.path, symbol.qualified_name, symbol.start_line)
                     for symbol in retrieved_symbols
                 }
-                retrieved_symbols.extend(
+                new_symbols = [
                     symbol
                     for symbol in retrieved.symbols
                     if (symbol.path, symbol.qualified_name, symbol.start_line) not in known_symbols
+                ]
+                retrieved_symbols.extend(new_symbols)
+                total_bytes += sum(
+                    len(symbol.content.encode("utf-8")) for symbol in new_symbols
                 )
                 retrieval_skipped_paths.update(retrieved.skipped_paths)
 

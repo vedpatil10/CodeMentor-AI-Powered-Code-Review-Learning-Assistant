@@ -93,6 +93,13 @@ class DeliveryStore:
     def __init__(self, database_path: Path) -> None:
         self._database_path = database_path
 
+    def check_ready(self) -> None:
+        """Verify the database can be opened and a write lock acquired."""
+        self._database_path.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(self._database_path, timeout=1) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            connection.rollback()
+
     def record(self, delivery: DeliveryRecord) -> DeliveryRecordResult:
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
         with sqlite3.connect(self._database_path, timeout=10) as connection:

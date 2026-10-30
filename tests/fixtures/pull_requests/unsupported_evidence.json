@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "app/handler.py",
+      "patch": "@@ -1 +1 @@\n-result = None\n+result = records[0]",
+      "source": "result = records[0]\nreturn result"
+    }
+  ],
+  "review": {
+    "summary": "The candidate cites evidence absent from the supplied source.",
+    "findings": [
+      {
+        "file_path": "app/handler.py",
+        "start_line": 1,
+        "end_line": 1,
+        "category": "correctness",
+        "severity": "medium",
+        "confidence": 0.99,
+        "title": "Unsupported candidate",
+        "problem": "The evidence is not present in the changed code.",
+        "why_it_matters": "The claim cannot be verified.",
+        "trigger_scenario": "Unknown.",
+        "suggested_action": "Do not publish this claim.",
+        "evidence": "fabricated evidence",
+        "evidence_source": "diff"
+      }
+    ]
+  }
+}

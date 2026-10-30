@@ -1,0 +1,3 @@
+{"case_id":"empty-result-defect","fixture":"fixtures/pull_requests/empty_input.json","expected_findings":[{"file_path":"app/handler.py","line":1,"category":"correctness"}]}
+{"case_id":"clean-change-abstention","fixture":"fixtures/pull_requests/clean_change.json","expected_findings":[]}
+{"case_id":"unsupported-evidence-rejection","fixture":"fixtures/pull_requests/unsupported_evidence.json","expected_findings":[]}

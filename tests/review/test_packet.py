@@ -104,6 +104,31 @@ def test_packet_includes_retrieved_symbols_only_when_repository_context_is_suppl
     assert without_context.retrieved_symbols == ()
 
 
+def test_retrieved_source_counts_toward_total_byte_and_token_budgets() -> None:
+    patch = "@@ -1 +1 @@\n-old = None\n+result = fetch_records()"
+    context = {"app/store.py": "def fetch_records():\n    return []"}
+    packet_bytes = len(patch.encode())
+    symbol_bytes = len(b"def fetch_records():\n    return []")
+
+    exact_budget = build_review_packet(
+        [FilePatchInput("app/handler.py", patch)],
+        PacketPolicy(max_total_bytes=packet_bytes + symbol_bytes),
+        repository_files=context,
+    )
+    insufficient_budget = build_review_packet(
+        [FilePatchInput("app/handler.py", patch)],
+        PacketPolicy(max_total_bytes=packet_bytes + symbol_bytes - 1),
+        repository_files=context,
+    )
+
+    assert exact_budget.input_bytes == packet_bytes + symbol_bytes
+    assert exact_budget.estimated_tokens == (exact_budget.input_bytes + 3) // 4
+    assert len(exact_budget.retrieved_symbols) == 1
+    assert insufficient_budget.input_bytes == packet_bytes
+    assert insufficient_budget.retrieved_symbols == ()
+    assert insufficient_budget.retrieval_skipped_paths == ("app/store.py",)
+
+
 @pytest.mark.parametrize("max_files", [0, 501])
 def test_packet_policy_rejects_unbounded_file_limits(max_files: int) -> None:
     with pytest.raises(ValidationError):
