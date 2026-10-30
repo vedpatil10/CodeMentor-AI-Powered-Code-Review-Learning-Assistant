@@ -162,5 +162,19 @@ slices; a checkpoint is not marked complete until its focused tests pass.
     `uv run --locked --extra dev ruff check .` (passed). Credential-pattern scan
     found no matches outside ignored dependency/build directories.
 - **Commit:** `fix: harden evaluation and review budgets` (created after final verification).
-- **Next:** Implement read-only GitHub PR fetching, capture immutable base/head
-    SHAs, and normalize changed file patches without publishing comments.
+- **Next:** Milestone 14 (completed).
+
+## Milestone 14: Read-only GitHub pull-request fetching
+
+- **Built:** A read-only REST client that fetches PR metadata and changed-file
+    patches, paginates with a configurable file cap, validates repository paths
+    and SHA formats, rechecks base/head SHAs after pagination, and fetches UTF-8
+    source only at the captured head SHA. API errors use sanitized codes and the
+    client rejects insecure or credential-bearing API base URLs.
+- **Tests:** `uv run --locked --extra dev pytest -q` (122 passed);
+    `uv run --locked --extra dev ruff check .` (passed);
+    `uv lock --check` (passed). GitHub responses are mocked; no live token or API
+    request was used.
+- **Commit:** `feat: fetch immutable GitHub pull request snapshots` (created after final verification).
+- **Next:** Connect the persisted worker queue to this client and the bounded
+    packet/review pipeline, with stale-head cancellation and no publication.

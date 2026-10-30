@@ -8,6 +8,7 @@ from pathlib import Path
 @dataclass(frozen=True, slots=True)
 class Settings:
     github_webhook_secret: str = ""
+    github_api_base_url: str = "https://api.github.com"
     database_path: Path = Path("data/codementor.sqlite3")
     openai_api_key: str = ""
     openai_model: str = "gpt-6-astra"
@@ -18,6 +19,9 @@ class Settings:
     def from_env(cls) -> "Settings":
         return cls(
             github_webhook_secret=os.environ.get("GITHUB_WEBHOOK_SECRET", ""),
+            github_api_base_url=os.environ.get(
+                "GITHUB_API_BASE_URL", "https://api.github.com"
+            ),
             database_path=Path(
                 os.environ.get("CODEMENTOR_DB_PATH", "data/codementor.sqlite3")
             ),
